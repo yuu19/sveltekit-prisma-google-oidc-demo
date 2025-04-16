@@ -1,4 +1,5 @@
-import { db } from "./db";
+// import { db } from "./db";
+import { db} from "../../hooks.server"
 import { encodeBase32, encodeHexLowerCase } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 

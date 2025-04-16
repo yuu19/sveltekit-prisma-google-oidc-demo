@@ -1,7 +1,7 @@
 import { TokenBucket } from "$lib/server/rate-limit";
 import { validateSessionToken, setSessionTokenCookie, deleteSessionTokenCookie } from "$lib/server/session";
 import { sequence } from "@sveltejs/kit/hooks";
-
+import { PrismaClient } from '@prisma/client';
 import type { Handle } from "@sveltejs/kit";
 
 const bucket = new TokenBucket<string>(100, 1);
@@ -47,3 +47,6 @@ const authHandle: Handle = async ({ event, resolve }) => {
 };
 
 export const handle = sequence(rateLimitHandle, authHandle);
+
+// Prismaの接続
+export const db = new PrismaClient();
