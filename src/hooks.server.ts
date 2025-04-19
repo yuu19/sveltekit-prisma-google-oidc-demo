@@ -2,12 +2,25 @@ import { TokenBucket } from "$lib/server/rate-limit";
 import { validateSessionToken, setSessionTokenCookie, deleteSessionTokenCookie } from "$lib/server/session";
 import { sequence } from "@sveltejs/kit/hooks";
 import type { Handle } from "@sveltejs/kit";
+import { Redis } from "ioredis/built";
+import { RedisClient } from "$lib/server/redis";
+import type { Bucket } from "$lib/server/rate-limit";
 
-const bucket = new TokenBucket<string>(100, 1);
+const redisClient = new RedisClient<Bucket>(new Redis({	
+	host: "localhost",
+	port: 6379
+}));
+
+const bucket = new TokenBucket(100, 1, redisClient);
+
+
 
 const rateLimitHandle: Handle = async ({ event, resolve }) => {
+	
 	// Note: Assumes X-Forwarded-For will always be defined.
-	const clientIP = event.request.headers.get("X-Forwarded-For");
+	// const clientIP = event.request.headers.get("X-Forwarded-For");
+
+	const clientIP = event.getClientAddress();
 	if (clientIP === null) {
 		return resolve(event);
 	}
@@ -17,7 +30,9 @@ const rateLimitHandle: Handle = async ({ event, resolve }) => {
 	} else {
 		cost = 3;
 	}
-	if (!bucket.consume(clientIP, cost)) {
+	
+	const allowed = await bucket.consume(clientIP, cost);
+	if (!allowed) {
 		return new Response("Too many requests", {
 			status: 429
 		});

@@ -1,16 +1,21 @@
-export class TokenBucket<_Key> {
+import { threadId } from "worker_threads";
+
+import { RedisClient } from "./redis";
+export class TokenBucket {
 	public max: number;
 	public refillIntervalSeconds: number;
+	public redisClient: RedisClient<Bucket>;
 
-	constructor(max: number, refillIntervalSeconds: number) {
+	constructor(max: number, refillIntervalSeconds: number, redisClient: RedisClient<Bucket>) {
 		this.max = max;
 		this.refillIntervalSeconds = refillIntervalSeconds;
+		this.redisClient = redisClient;
 	}
 
-	private storage = new Map<_Key, Bucket>();
 
-	public check(key: _Key, cost: number): boolean {
-		const bucket = this.storage.get(key) ?? null;
+	public async check(key: string, cost: number): Promise<boolean> {
+		const bucket = await this.redisClient.get(key);
+		// const bucket = this.storage.get(key) ?? null;
 		if (bucket === null) {
 			return true;
 		}
@@ -22,15 +27,15 @@ export class TokenBucket<_Key> {
 		return bucket.count >= cost;
 	}
 
-	public consume(key: _Key, cost: number): boolean {
-		let bucket = this.storage.get(key) ?? null;
+	public async consume(key: string, cost: number): Promise<boolean> {
+		let bucket = await this.redisClient.get(key) ?? null;
 		const now = Date.now();
 		if (bucket === null) {
 			bucket = {
 				count: this.max - cost,
 				refilledAt: now
 			};
-			this.storage.set(key, bucket);
+			await this.redisClient.set(key, bucket);
 			return true;
 		}
 		const refill = Math.floor((now - bucket.refilledAt) / (this.refillIntervalSeconds * 1000));
@@ -39,15 +44,15 @@ export class TokenBucket<_Key> {
 			bucket.refilledAt = now;
 		}
 		if (bucket.count < cost) {
-			this.storage.set(key, bucket);
+			await this.redisClient.set(key, bucket);
 			return false;
 		}
 		bucket.count -= cost;
-		this.storage.set(key, bucket);
+		this.redisClient.set(key, bucket);
 		return true;
 	}
 }
-interface Bucket {
+export interface Bucket {
 	count: number;
 	refilledAt: number;
 }

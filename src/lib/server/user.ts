@@ -1,5 +1,5 @@
 import { db } from "$lib/server/prisma";
-import type { User } from "../../../generated/prisma";
+import type { User } from "@prisma-app/client";
 export async function createUser(googleId: string, email: string, name: string, picture: string): Promise<User> {
 
 	const user = await db.user.create({

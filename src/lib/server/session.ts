@@ -1,6 +1,6 @@
 import { db } from "$lib/server/prisma";
-import type { User } from "../../../generated/prisma";
-import type { Session } from "../../../generated/prisma";
+import type { User } from "@prisma-app/client";
+import type { Session } from "@prisma-app/client";
 import { encodeBase32, encodeHexLowerCase } from "@oslojs/encoding";
 import { sha256 } from "@oslojs/crypto/sha2";
 import type { RequestEvent } from "@sveltejs/kit";
