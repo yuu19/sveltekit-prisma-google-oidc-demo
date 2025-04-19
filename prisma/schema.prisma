@@ -3,7 +3,8 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  // 参考: https://github.com/prisma/prisma/discussions/20200#discussioncomment-7441241
+  output   = "../node_modules/@prisma-app/client"
 }
 
 datasource db {
@@ -13,19 +14,22 @@ datasource db {
 
 model User {
   id        Int       @id @default(autoincrement())
-  google_id String    @unique
+  googleId String    @unique @map("google_id")
   email     String    @unique
   name      String
   picture   String
   sessions  Session[]
 
-  @@index([google_id]) // SQLの "CREATE INDEX google_id_index ON user(google_id);" に対応
+  @@index([googleId]) // SQLの "CREATE INDEX google_id_index ON user(google_id);" に対応
+  @@map("users")
 }
 
 model Session {
   id         String @id
-  user_id    Int
-  expires_at Int
+  userId    Int @map("user_id")
+  expiresAt DateTime @map("expires_at")
 
-  user       User   @relation(fields: [user_id], references: [id])
+  user       User   @relation(fields: [userId], references: [id])
+  
+  @@map("sessions")
 }
