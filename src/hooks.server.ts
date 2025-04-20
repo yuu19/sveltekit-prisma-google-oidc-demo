@@ -5,10 +5,10 @@ import type { Handle } from "@sveltejs/kit";
 import { Redis } from "ioredis/built";
 import { RedisClient } from "$lib/server/redis";
 import type { Bucket } from "$lib/server/rate-limit";
-
+import { REDIS_HOSTNAME, REDIS_PORT } from "$env/static/private";
 const redisClient = new RedisClient<Bucket>(new Redis({	
-	host: "localhost",
-	port: 6379
+	host: REDIS_HOSTNAME,
+	port: Number(REDIS_PORT)
 }));
 
 const bucket = new TokenBucket(100, 1, redisClient);
