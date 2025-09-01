@@ -6,17 +6,16 @@ import { Redis } from "ioredis/built";
 import { RedisClient } from "$lib/server/redis";
 import type { Bucket } from "$lib/server/rate-limit";
 import { REDIS_HOSTNAME, REDIS_PORT } from "$env/static/private";
-const redisClient = new RedisClient<Bucket>(new Redis({	
-	host: REDIS_HOSTNAME,
-	port: Number(REDIS_PORT)
-}));
+const redisClient = new RedisClient<Bucket>(
+	new Redis({
+		host: REDIS_HOSTNAME,
+		port: Number(REDIS_PORT)
+	})
+);
 
 const bucket = new TokenBucket(100, 1, redisClient);
 
-
-
 const rateLimitHandle: Handle = async ({ event, resolve }) => {
-	
 	// Note: Assumes X-Forwarded-For will always be defined.
 	// const clientIP = event.request.headers.get("X-Forwarded-For");
 
@@ -30,7 +29,7 @@ const rateLimitHandle: Handle = async ({ event, resolve }) => {
 	} else {
 		cost = 3;
 	}
-	
+
 	const allowed = await bucket.consume(clientIP, cost);
 	if (!allowed) {
 		return new Response("Too many requests", {
@@ -61,5 +60,3 @@ const authHandle: Handle = async ({ event, resolve }) => {
 };
 
 export const handle = sequence(rateLimitHandle, authHandle);
-
-

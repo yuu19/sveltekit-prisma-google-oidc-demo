@@ -1,7 +1,6 @@
 // See https://kit.svelte.dev/docs/types#app
 // for information about these interfaces
-import type { User } from "@prisma-app/client";
-import type { Session } from "@prisma-app/client";
+import type { User, Session } from "$lib/server/schema";
 
 declare global {
 	namespace App {
