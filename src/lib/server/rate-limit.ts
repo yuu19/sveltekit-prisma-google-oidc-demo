@@ -12,7 +12,6 @@ export class TokenBucket {
 		this.redisClient = redisClient;
 	}
 
-
 	public async check(key: string, cost: number): Promise<boolean> {
 		const bucket = await this.redisClient.get(key);
 		// const bucket = this.storage.get(key) ?? null;
@@ -28,7 +27,7 @@ export class TokenBucket {
 	}
 
 	public async consume(key: string, cost: number): Promise<boolean> {
-		let bucket = await this.redisClient.get(key) ?? null;
+		let bucket = (await this.redisClient.get(key)) ?? null;
 		const now = Date.now();
 		if (bucket === null) {
 			bucket = {

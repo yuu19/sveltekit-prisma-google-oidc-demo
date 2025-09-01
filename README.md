@@ -1,7 +1,6 @@
-# Sveltekit + Arctic + Prisma を使用したGoogle OIDCの例
+# Sveltekit + Arctic + Drizzle ORM を使用したGoogle OIDCの例
 
-
-このリポジトリは https://github.com/lucia-auth/example-sveltekit-google-oauth をフォークし、ORM に Prisma、レートリミットに Redis を導入したものです。
+このリポジトリは https://github.com/lucia-auth/example-sveltekit-google-oauth をフォークし、ORM に Drizzle、レートリミットに Redis を導入したものです。
 
 ## プロジェクト初期設定(開発時)
 
@@ -18,15 +17,14 @@ REDIS_PORT=6379 #redisのポート番号
 ```
 
 - コンテナの起動
-redis, serverless-redis-httpサービスを起動します。
+  redis, serverless-redis-httpサービスを起動します。
 
 ```bash
 docker compose up
 ```
 
-
-- Prisma マイグレーションの実行
+- Drizzle マイグレーションの実行
 
 ```bash
-npx prisma migrate dev
+npx drizzle-kit push:sqlite
 ```

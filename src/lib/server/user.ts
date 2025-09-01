@@ -1,25 +1,13 @@
-import { db } from "$lib/server/prisma";
-import type { User } from "@prisma-app/client";
+import { db } from "$lib/server/db";
+import { users, type User } from "$lib/server/schema";
+import { eq } from "drizzle-orm";
+
 export async function createUser(googleId: string, email: string, name: string, picture: string): Promise<User> {
-
-	const user = await db.user.create({
-		data: {
-			googleId,
-			email,
-			name,
-			picture,
-		},
-	});
-
-	return user;
+	const [row] = await db.insert(users).values({ googleId, email, name, picture }).returning();
+	return row;
 }
 
 export async function getUserFromGoogleId(googleId: string): Promise<User | null> {
-	const user = await db.user.findUnique({
-		where: {
-			googleId
-		}
-});
-
-	return user;
+	const [row] = await db.select().from(users).where(eq(users.googleId, googleId));
+	return row ?? null;
 }
