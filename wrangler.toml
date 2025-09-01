@@ -1,0 +1,10 @@
+name = "sveltekit-prisma-google-oidc-demo"
+main = "./.svelte-kit/cloudflare/worker.js"
+compatibility_date = "2024-05-01"
+
+[vars]
+GOOGLE_CLIENT_ID = ""
+GOOGLE_CLIENT_SECRET = ""
+DATABASE_URL = ""
+REDIS_HOSTNAME = ""
+REDIS_PORT = ""

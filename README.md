@@ -28,3 +28,15 @@ docker compose up
 ```bash
 npx drizzle-kit push:sqlite
 ```
+
+## Cloudflare Workers へのデプロイ
+
+Cloudflare Workers にデプロイするには次の手順を実行します:
+
+```bash
+pnpm add -D @sveltejs/adapter-cloudflare wrangler
+pnpm run build
+pnpm run deploy
+```
+
+`wrangler.toml` の `[vars]` セクションに環境変数を設定してください。
